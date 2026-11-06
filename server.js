@@ -15,28 +15,28 @@ app.use(express.json());
 
 // Request logging
 app.use((req, res, next) => {
-  console.log(`[REQUEST] ${req.method} ${req.originalUrl}`);
-  next();
+    console.log(`[REQUEST] ${req.method} ${req.originalUrl}`);
+    next();
 });
 
 // Home route
 app.get("/", (req, res) => {
-  res.status(200).json({
-    message: "Lumina Placement Management API is running"
-  });
+    res.status(200).json({
+        message: "Lumina Placement Management API is running"
+    });
 });
 
 // Database health check
 app.get("/api/health/db", async (req, res, next) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
+    try {
+        await prisma.$queryRaw`SELECT 1`;
 
-    res.status(200).json({
-      message: "Database connected successfully"
-    });
-  } catch (error) {
-    next(error);
-  }
+        res.status(200).json({
+            message: "Database connected successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
 });
 
 // Authentication routes
@@ -51,8 +51,8 @@ app.use("/api/internships", require("./routes/internshipRoutes"));
 
 // Additional CRUD routes
 app.use(
-  "/api/semester-performance",
-  require("./routes/semesterPerformanceRoutes")
+    "/api/semester-performance",
+    require("./routes/semesterPerformanceRoutes")
 );
 app.use("/api/resumes", require("./routes/resumeRoutes"));
 app.use("/api/activities", require("./routes/activityRoutes"));
@@ -61,17 +61,22 @@ app.use("/api/awards", require("./routes/awardRoutes"));
 
 // Handle unknown routes
 app.use((req, res) => {
-  res.status(404).json({
-    message: "API endpoint not found",
-    method: req.method,
-    path: req.originalUrl
-  });
+    res.status(404).json({
+        message: "API endpoint not found",
+        method: req.method,
+        path: req.originalUrl
+    });
 });
 
 // Central error handler (must remain last)
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Lumina API running at http://localhost:${PORT}`);
-});
+// Start server only when executed directly
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Lumina API running at http://localhost:${PORT}`);
+    });
+}
+
+// Export Express app for Jest and Supertest
+module.exports = app;
